@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Quản Lý Bãi Trông Giữ Xe HUBT</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f4f6f9;
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-bottom: 24px;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            background-color: #fff;
+            border-bottom: 1px solid #f0f0f0;
+            padding: 16px 20px;
+            font-weight: 600;
+            border-radius: 12px 12px 0 0 !important;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-header i {
+            margin-right: 10px;
+            color: #2a5298;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-weight: 600;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #1c7e97 0%, #5bbece 100%);
+            transform: scale(1.02);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        .btn-success:hover {
+            background: linear-gradient(135deg, #0e8178 0%, #2cd86f 100%);
+            transform: scale(1.02);
+        }
+
+        .table-custom {
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+
+        .table-custom tr {
+            background-color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            border-radius: 8px;
+        }
+
+        .table-custom th {
+            border-top: none;
+            border-bottom: none;
+            background-color: #f8f9fa;
+            color: #6c757d;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            padding: 12px 16px;
+        }
+
+        .table-custom td {
+            border-top: none;
+            padding: 16px;
+            vertical-align: middle;
+        }
+
+        .table-custom td:first-child,
+        .table-custom th:first-child {
+            border-radius: 8px 0 0 8px;
+        }
+
+        .table-custom td:last-child,
+        .table-custom th:last-child {
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .badge-bike {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .badge-motor {
+            background-color: #fff3e0;
+            color: #e65100;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark mb-5">
+        <div class="container">
+            <a class="navbar-brand" href="/"><i class="fa-solid fa-square-parking me-2"></i> HUBT Parking</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/"><i class="fa-solid fa-house me-1"></i> Bảng điều khiển</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/students"><i class="fa-solid fa-users me-1"></i> Sinh viên</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/cards"><i class="fa-solid fa-credit-card me-1"></i> Quản lý thẻ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/reports"><i class="fa-solid fa-chart-bar me-1"></i> Báo cáo</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container">
+        
+        <!-- Alerts -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fa-solid fa-circle-check me-2"></i> <strong th:text="${success}"></strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="fa-solid fa-triangle-exclamation me-2"></i> <strong th:text="${error}"></strong>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="row align-items-stretch">
+            <!-- Park Vehicle Form -->
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header fs-5 text-primary">
+                        <i class="fa-solid fa-arrow-right-to-bracket text-primary"></i> Ghi Nhận Xe Vào (Check-In)
+                    </div>
+                    <div class="card-body p-4">
+                        <form action="/park" method="post">
+                            <div class="mb-4">
+                                <label class="form-label text-muted fw-bold">Mã Thẻ (Chọn Thẻ/Quét Thẻ)</label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text bg-light text-primary"><i class="fa-solid fa-credit-card"></i></span>
+                                    <select class="form-select" name="cardNumber" required autofocus>
+                                        <option value="" selected disabled>-- Chọn Thẻ Để Vào Bãi --</option>
+                                        <option th:each="card : ${activeCards}" 
+                                                th:value="${card.cardNumber}" 
+                                                th:text="${card.cardNumber} + ' - ' + (${card.student != null ? card.student.fullName : 'Khách vãng lai'})">
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="form-text mt-2 text-danger"><i class="fa-solid fa-circle-info me-1"></i>Chỉ thẻ đang trạng thái ACTIVE mới hiển thị.</div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label text-muted fw-bold">Biển Số Xe</label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text bg-light text-primary"><i class="fa-solid fa-id-card"></i></span>
+                                    <input type="text" class="form-control" name="licensePlate" placeholder="VD: 29A1-12345" required>
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label class="form-label text-muted fw-bold">Loại Xe</label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text bg-light text-primary"><i class="fa-solid fa-motorcycle"></i></span>
+                                    <select class="form-select" name="vehicleType">
+                                        <option value="Xe Máy">Xe Máy</option>
+                                        <option value="Xe Đạp">Xe Đạp</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 btn-lg shadow-sm"><i class="fa-solid fa-check me-2"></i>Xác nhận & Cấp chỗ đỗ</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Take Vehicle Out Form -->
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header fs-5 text-success">
+                        <i class="fa-solid fa-arrow-right-from-bracket text-success"></i> Ghi Nhận Xe Ra (Check-Out)
+                    </div>
+                    <div class="card-body p-4 d-flex flex-column justify-content-center">
+                        <div class="text-center mb-4">
+                            <img src="https://cdn-icons-png.flaticon.com/512/3238/3238059.png" alt="Parking" style="width: 140px; opacity: 0.8;">
+                        </div>
+                        <form action="/take-out" method="post">
+                            <div class="mb-4">
+                                <label class="form-label text-muted fw-bold">Quét Mã Thẻ hoặc Nhập Biển Số Xe</label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text bg-light text-success"><i class="fa-solid fa-qrcode"></i></span>
+                                    <input type="text" class="form-control" name="identifier" placeholder="Ví dụ: CARD001 hoặc 29A1-12345" required autocomplete="off">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-success w-100 btn-lg shadow-sm mt-3"><i class="fa-solid fa-money-bill-wave me-2"></i>Thanh Toán & Mở Cổng</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Active Parked Vehicles -->
+        <div class="row mt-2 mb-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center bg-white border-0 pt-4 pb-2 px-4">
+                        <div class="fs-5 fw-bold text-dark">
+                            <i class="fa-solid fa-list text-primary me-2"></i> Danh Sách Xe Trong Bãi
+                        </div>
+                        <span class="badge bg-primary rounded-pill px-3 py-2 shadow-sm fs-6" th:text="${parkedVehicles.size()} + ' Xe đang đỗ'"></span>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive px-4 pb-4 pt-2">
+                            <table class="table table-custom mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Thẻ Gửi</th>
+                                        <th>Biển Số Xe</th>
+                                        <th>Loại Xe</th>
+                                        <th>Vị Trí Đỗ</th>
+                                        <th>Chủ Thẻ</th>
+                                        <th>Thời Gian Vào</th>
+                                        <th>Trạng Thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="ticket : ${parkedVehicles}">
+                                        <td>
+                                            <span class="badge bg-dark"><i class="fa-solid fa-id-card me-1"></i> <span th:text="${ticket.parkingCard.cardNumber}"></span></span>
+                                        </td>
+                                        <td>
+                                            <strong class="fs-6" th:text="${ticket.vehicle.licensePlate}"></strong>
+                                        </td>
+                                        <td>
+                                            <span th:class="${ticket.vehicle.vehicleType == 'Xe Đạp' ? 'badge-bike' : 'badge-motor'}">
+                                                <i th:class="${ticket.vehicle.vehicleType == 'Xe Đạp' ? 'fa-solid fa-bicycle me-1' : 'fa-solid fa-motorcycle me-1'}"></i>
+                                                <span th:text="${ticket.vehicle.vehicleType}"></span>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="text-primary fw-bold"><i class="fa-solid fa-map-pin me-1"></i> <span th:text="${ticket.parkingSlot.location}"></span></span>
+                                        </td>
+                                        <td>
+                                            <div th:if="${ticket.parkingCard.student != null}">
+                                                <span class="badge bg-secondary mb-1"><i class="fa-solid fa-user-graduate me-1"></i> <span th:text="${ticket.parkingCard.student.studentCode}"></span></span><br>
+                                                <small class="fw-bold text-muted" th:text="${ticket.parkingCard.student.fullName}"></small>
+                                            </div>
+                                            <div th:unless="${ticket.parkingCard.student != null}">
+                                                <span class="text-black-50 fst-italic"><i class="fa-solid fa-user-clock me-1"></i> Khách vãng lai</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="text-primary font-monospace fw-bold" th:text="${#temporals.format(ticket.entryTime, 'HH:mm - dd/MM/yyyy')}"></div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 px-2 py-1 shadow-sm"><i class="fa-solid fa-circle-dot fa-xs fa-fade me-1"></i> Đang đỗ</span>
+                                        </td>
+                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(parkedVehicles)}">
+                                        <td colspan="7" class="text-center py-5">
+                                            <img src="https://cdn-icons-png.flaticon.com/512/2855/2855581.png" alt="Empty" style="width: 80px; opacity: 0.5;" class="mb-3">
+                                            <div class="text-muted fs-5">Hiện không có xe nào trong bãi.</div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
